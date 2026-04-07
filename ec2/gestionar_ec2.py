@@ -65,6 +65,16 @@ def main():
 
     accion = sys.argv[1].lower()
 
+    acciones_validas = ["listar", "iniciar", "detener", "terminar"]
+    if accion not in acciones_validas:
+        print(f"Error: acción '{accion}' no válida. Opciones: {', '.join(acciones_validas)}")
+        sys.exit(1)
+
+    if accion in ("iniciar", "detener", "terminar") and len(sys.argv) < 3:
+        print(f"Error: la acción '{accion}' requiere un instance_id.")
+        print(f"Uso: python3 gestionar_ec2.py {accion} <instance_id>")
+        sys.exit(1)
+
     if accion == "listar":
         listar_instancias(cliente)
     elif accion == "iniciar":
@@ -73,8 +83,6 @@ def main():
         detener_instancia(cliente, sys.argv[2])
     elif accion == "terminar":
         terminar_instancia(cliente, sys.argv[2])
-    else:
-        print(f"Acción no implementada aún: {accion}")
 
 
 if __name__ == "__main__":
