@@ -10,6 +10,7 @@ Uso:
 
 import sys
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 
 
 def obtener_cliente(region: str):
@@ -17,41 +18,57 @@ def obtener_cliente(region: str):
 
 
 def listar_instancias(cliente):
-    respuesta = cliente.describe_instances()
-    reservaciones = respuesta.get("Reservations", [])
-    if not reservaciones:
-        print("No se encontraron instancias EC2.")
-        return
-    print(f"{'ID':<22} {'Estado':<14} {'Tipo':<14} {'IP Pública'}")
-    print("-" * 70)
-    for reservacion in reservaciones:
-        for instancia in reservacion["Instances"]:
-            iid = instancia.get("InstanceId", "N/A")
-            estado = instancia["State"]["Name"]
-            tipo = instancia.get("InstanceType", "N/A")
-            ip = instancia.get("PublicIpAddress", "N/A")
-            print(f"{iid:<22} {estado:<14} {tipo:<14} {ip}")
+    try:
+        respuesta = cliente.describe_instances()
+        reservaciones = respuesta.get("Reservations", [])
+        if not reservaciones:
+            print("No se encontraron instancias EC2.")
+            return
+        print(f"{'ID':<22} {'Estado':<14} {'Tipo':<14} {'IP Pública'}")
+        print("-" * 70)
+        for reservacion in reservaciones:
+            for instancia in reservacion["Instances"]:
+                iid = instancia.get("InstanceId", "N/A")
+                estado = instancia["State"]["Name"]
+                tipo = instancia.get("InstanceType", "N/A")
+                ip = instancia.get("PublicIpAddress", "N/A")
+                print(f"{iid:<22} {estado:<14} {tipo:<14} {ip}")
+    except (BotoCoreError, ClientError) as e:
+        print(f"Error al listar instancias: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def iniciar_instancia(cliente, instance_id: str):
-    respuesta = cliente.start_instances(InstanceIds=[instance_id])
-    estado_previo = respuesta["StartingInstances"][0]["PreviousState"]["Name"]
-    estado_actual = respuesta["StartingInstances"][0]["CurrentState"]["Name"]
-    print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+    try:
+        respuesta = cliente.start_instances(InstanceIds=[instance_id])
+        estado_previo = respuesta["StartingInstances"][0]["PreviousState"]["Name"]
+        estado_actual = respuesta["StartingInstances"][0]["CurrentState"]["Name"]
+        print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+    except (BotoCoreError, ClientError) as e:
+        print(f"Error al iniciar la instancia {instance_id}: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def detener_instancia(cliente, instance_id: str):
-    respuesta = cliente.stop_instances(InstanceIds=[instance_id])
-    estado_previo = respuesta["StoppingInstances"][0]["PreviousState"]["Name"]
-    estado_actual = respuesta["StoppingInstances"][0]["CurrentState"]["Name"]
-    print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+    try:
+        respuesta = cliente.stop_instances(InstanceIds=[instance_id])
+        estado_previo = respuesta["StoppingInstances"][0]["PreviousState"]["Name"]
+        estado_actual = respuesta["StoppingInstances"][0]["CurrentState"]["Name"]
+        print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+    except (BotoCoreError, ClientError) as e:
+        print(f"Error al detener la instancia {instance_id}: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def terminar_instancia(cliente, instance_id: str):
-    respuesta = cliente.terminate_instances(InstanceIds=[instance_id])
-    estado_previo = respuesta["TerminatingInstances"][0]["PreviousState"]["Name"]
-    estado_actual = respuesta["TerminatingInstances"][0]["CurrentState"]["Name"]
-    print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+    try:
+        respuesta = cliente.terminate_instances(InstanceIds=[instance_id])
+        estado_previo = respuesta["TerminatingInstances"][0]["PreviousState"]["Name"]
+        estado_actual = respuesta["TerminatingInstances"][0]["CurrentState"]["Name"]
+        print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+    except (BotoCoreError, ClientError) as e:
+        print(f"Error al terminar la instancia {instance_id}: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():
