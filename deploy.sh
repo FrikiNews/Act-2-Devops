@@ -15,3 +15,9 @@ if [[ -z "$ACCION" || -z "$INSTANCE_ID" || -z "$DIRECTORIO" || -z "$BUCKET" ]]; 
 fi
 
 echo "Parámetros recibidos - Acción: ${ACCION} | Instancia: ${INSTANCE_ID} | Dir: ${DIRECTORIO} | Bucket: ${BUCKET}"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "[1/2] Ejecutando gestión EC2..."
+python3 "${SCRIPT_DIR}/ec2/gestionar_ec2.py" "$ACCION" "$INSTANCE_ID"
+echo "[1/2] EC2 completado."
