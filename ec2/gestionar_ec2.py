@@ -16,17 +16,38 @@ def obtener_cliente(region: str):
     return boto3.client("ec2", region_name=region)
 
 
+def listar_instancias(cliente):
+    respuesta = cliente.describe_instances()
+    reservaciones = respuesta.get("Reservations", [])
+    if not reservaciones:
+        print("No se encontraron instancias EC2.")
+        return
+    print(f"{'ID':<22} {'Estado':<14} {'Tipo':<14} {'IP Pública'}")
+    print("-" * 70)
+    for reservacion in reservaciones:
+        for instancia in reservacion["Instances"]:
+            iid = instancia.get("InstanceId", "N/A")
+            estado = instancia["State"]["Name"]
+            tipo = instancia.get("InstanceType", "N/A")
+            ip = instancia.get("PublicIpAddress", "N/A")
+            print(f"{iid:<22} {estado:<14} {tipo:<14} {ip}")
+
+
 def main():
     import os
     region = os.environ.get("REGION", "us-east-1")
-    obtener_cliente(region)
+    cliente = obtener_cliente(region)
 
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
 
     accion = sys.argv[1].lower()
-    print(f"Acción recibida: {accion}")
+
+    if accion == "listar":
+        listar_instancias(cliente)
+    else:
+        print(f"Acción no implementada aún: {accion}")
 
 
 if __name__ == "__main__":
