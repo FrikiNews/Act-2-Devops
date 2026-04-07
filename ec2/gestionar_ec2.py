@@ -47,6 +47,13 @@ def detener_instancia(cliente, instance_id: str):
     print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
 
 
+def terminar_instancia(cliente, instance_id: str):
+    respuesta = cliente.terminate_instances(InstanceIds=[instance_id])
+    estado_previo = respuesta["TerminatingInstances"][0]["PreviousState"]["Name"]
+    estado_actual = respuesta["TerminatingInstances"][0]["CurrentState"]["Name"]
+    print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}")
+
+
 def main():
     import os
     region = os.environ.get("REGION", "us-east-1")
@@ -64,6 +71,8 @@ def main():
         iniciar_instancia(cliente, sys.argv[2])
     elif accion == "detener":
         detener_instancia(cliente, sys.argv[2])
+    elif accion == "terminar":
+        terminar_instancia(cliente, sys.argv[2])
     else:
         print(f"Acción no implementada aún: {accion}")
 
