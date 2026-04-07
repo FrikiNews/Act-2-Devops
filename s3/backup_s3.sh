@@ -4,4 +4,12 @@
 
 set -euo pipefail
 
-echo "Script de backup S3 - en construcción"
+if [[ $# -lt 2 ]]; then
+    echo "Uso: bash s3/backup_s3.sh <directorio> <bucket>" >&2
+    exit 1
+fi
+
+DIRECTORIO="$1"
+BUCKET="$2"
+
+echo "Parámetros recibidos - Directorio: ${DIRECTORIO} | Bucket: ${BUCKET}"
