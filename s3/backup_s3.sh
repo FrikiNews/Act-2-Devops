@@ -22,3 +22,10 @@ fi
 echo "Comprimiendo ${DIRECTORIO} en ${ARCHIVO_COMPRIMIDO}..."
 tar -czf "$ARCHIVO_COMPRIMIDO" -C "$(dirname "$DIRECTORIO")" "$(basename "$DIRECTORIO")"
 echo "Compresión exitosa."
+
+DESTINO_S3="s3://${BUCKET}/backups/backup_${TIMESTAMP}.tar.gz"
+echo "Subiendo a ${DESTINO_S3}..."
+aws s3 cp "$ARCHIVO_COMPRIMIDO" "$DESTINO_S3"
+echo "Subida exitosa."
+
+rm -f "$ARCHIVO_COMPRIMIDO"
