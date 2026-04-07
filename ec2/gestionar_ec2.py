@@ -33,6 +33,13 @@ def listar_instancias(cliente):
             print(f"{iid:<22} {estado:<14} {tipo:<14} {ip}")
 
 
+def iniciar_instancia(cliente, instance_id: str):
+    respuesta = cliente.start_instances(InstanceIds=[instance_id])
+    estado_previo = respuesta["StartingInstances"][0]["PreviousState"]["Name"]
+    estado_actual = respuesta["StartingInstances"][0]["CurrentState"]["Name"]
+    print(f"Instancia {instance_id}: {estado_previo} → {estado_actual}") 
+
+
 def main():
     import os
     region = os.environ.get("REGION", "us-east-1")
@@ -46,6 +53,8 @@ def main():
 
     if accion == "listar":
         listar_instancias(cliente)
+    elif accion == "iniciar":
+        iniciar_instancia(cliente, sys.argv[2])
     else:
         print(f"Acción no implementada aún: {accion}")
 
