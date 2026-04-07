@@ -1,0 +1,21 @@
+# Configuración sensible (no subir credenciales ni valores del entorno)
+config/config.env
+
+# Logs generados automáticamente
+logs/*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Archivos temporales de backup
+/tmp/backup_*.tar.gz
+
+# Entornos virtuales
+.venv/
+venv/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
